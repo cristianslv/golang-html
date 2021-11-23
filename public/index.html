@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+    <title>To-do list</title>
+</head>
+<body>
+    <style>
+        :root {
+            margin: 0px;
+            padding: 0px;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            overflow-y: hidden;
+            background-color: #dae0f5;
+        }
+
+        .app {
+            height: 100vh;
+            flex-flow: column;
+            position: relative;
+        }
+
+        .flex-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .font-white {
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .font-gray {
+            color: #9197a2;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        header {
+            height: 50px;
+            width: 400px;
+            margin: 15px;
+            border-radius: 4px;
+            background-color: #a879e2;
+        }
+
+        .content {
+            width: 400px;
+            min-height: 50px;
+            max-height: 50vh;
+            overflow-y: auto !important;
+            flex-flow: column;
+            border-radius: 4px;
+            background-color: white;
+            box-shadow: 0px 7px 15px 5px lightgrey;
+        }
+
+        /* width */
+        .content::-webkit-scrollbar {
+            width: 4px;
+            border-radius: 4px;
+        }
+
+        /* Track */
+        .content::-webkit-scrollbar-track {
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+            background: #f1f1f1; 
+        }
+        
+        /* Handle */
+        .content::-webkit-scrollbar-thumb {
+            background: #888; 
+            border-radius: 2px;
+            /* border-bottom-right-radius: 2px; */
+        }
+
+        /* Handle on hover */
+        .content::-webkit-scrollbar-thumb:hover {
+            background: #555; 
+        }
+
+        .todo {
+            margin: 15px;
+            display: flex;
+            text-align: left;
+            padding: 15px 25px;
+            border-radius: 4px;
+            justify-content: space-between;
+            transition: all 0.15s;
+        }
+
+        .todo:hover {
+            background-color: rgb(231, 231, 231);
+        }
+
+        .todo:last-child {
+            margin-bottom: 35px !important;
+        }
+
+        .add-todo {
+            z-index: 1;
+            width: 175px;
+            height: 40px;
+            border: none;
+            margin-top: -17px;
+            text-align: center;
+            border-radius: 50px;
+            transition: all 0.1s;
+            font-size: 16px !important;
+            background-color: #a879e2;
+            box-shadow: 0px 5px 15px 8px rgb(206, 206, 206);
+        }
+
+        .add-todo:active {
+            transform: scale(0.8);
+        }
+
+        #new-todo {
+            width: 378px;
+            height: 50px;
+            border: none;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            padding-left: 15px;
+            outline: 3.5px solid #a879e2;
+        }
+
+        .delete-todo {
+            cursor: pointer;
+        }
+    </style>
+
+    <div class="app flex-center">
+        <header class="flex-center font-white">
+            To-do list
+        </header>
+
+        <input type="text" id="new-todo" placeholder="Your Todo" maxlength="35">
+
+        <section class="content font-gray">
+            {{range .Todos}}
+                <div class="todo">
+                    <label for="todo-{{.Id}}">
+                        <span>
+                            <input type="checkbox" name="todo" id="todo-{{.Id}}">
+                            {{.Description}}
+                        </span>
+                    </label>
+    
+                    <a class="delete-todo" data-id="{{.Id}}">
+                        &#10005;
+                    </a>
+                </div>
+            {{end}}
+        </section>
+
+        <button class="add-todo font-white" id="button-todo">
+            + New Todo
+        </button>
+    </div>
+
+    <script>
+        const button = document.getElementById("button-todo");
+        const button2 = document.getElementsByClassName("delete-todo");
+
+        button.addEventListener("click", async function(event) {
+            const description = document.getElementById("new-todo").value;
+
+            if (description != "") {
+                const response = await fetch("http://localhost:5000/todo", {
+                    method: "POST",
+                    body: JSON.stringify({description: description})
+                });
+    
+                location.reload();
+            }
+        });
+
+        for (let index = 0; index < button2.length; index++) {
+            button2[index].addEventListener("click", async function(event) {
+                const id = button2[index].dataset.id;
+    
+                const response = await fetch("http://localhost:5000/delete", {
+                    method: "DELETE",
+                    body: JSON.stringify({id: parseInt(id)})
+                });
+    
+                location.reload();
+            });
+        }
+    </script>
+</body>
+</html>
